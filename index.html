@@ -3,169 +3,56 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Swap USDT ↔ USDC</title>
-  <meta name="description" content="Быстрый non-custodial обмен USDT на USDC и обратно." />
+  <title>StableSwap — USDT ↔ USDC</title>
+  <meta name="description" content="Быстрый и безопасный обмен USDT на USDC в вашем кошельке." />
   <style>
-    :root {
-      --bg: #05070b;
-      --card: rgba(255,255,255,.075);
-      --card2: rgba(255,255,255,.045);
-      --line: rgba(255,255,255,.12);
-      --text: #f6fff9;
-      --muted: rgba(246,255,249,.68);
-      --green: #62f6a4;
-      --green2: #28d985;
-      --cyan: #7dd3fc;
-      --danger: #ff7b7b;
-    }
-    * { box-sizing: border-box; }
-    body {
-      margin: 0;
-      min-height: 100vh;
-      color: var(--text);
-      font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Arial, sans-serif;
-      background:
-        radial-gradient(circle at 12% 8%, rgba(98,246,164,.24), transparent 28rem),
-        radial-gradient(circle at 86% 18%, rgba(125,211,252,.18), transparent 28rem),
-        linear-gradient(135deg, #05070b, #080d16 55%, #05070b);
-    }
-    a { color: inherit; }
-    .wrap { width: min(1160px, calc(100% - 40px)); margin: 0 auto; }
-    header { padding: 28px 0; display: flex; align-items: center; justify-content: space-between; gap: 16px; }
-    .logo { display: flex; align-items: center; gap: 12px; font-weight: 900; letter-spacing: -.03em; }
-    .logo-mark { width: 42px; height: 42px; border-radius: 16px; background: linear-gradient(135deg, var(--green), var(--cyan)); box-shadow: 0 0 40px rgba(98,246,164,.28); }
-    .nav { display: flex; gap: 14px; color: var(--muted); font-size: 14px; }
-    .pill { border: 1px solid var(--line); background: rgba(255,255,255,.05); padding: 10px 14px; border-radius: 999px; }
-    .hero { display: grid; grid-template-columns: 1fr 440px; gap: 58px; align-items: center; padding: 48px 0 72px; }
-    .badge { display: inline-flex; gap: 8px; align-items: center; color: #d7ffe9; border: 1px solid rgba(98,246,164,.25); background: rgba(98,246,164,.1); padding: 10px 14px; border-radius: 999px; font-size: 14px; }
-    .dot { width: 8px; height: 8px; border-radius: 50%; background: var(--green); box-shadow: 0 0 18px var(--green); }
-    h1 { margin: 22px 0 18px; font-size: clamp(46px, 7vw, 82px); line-height: .96; letter-spacing: -.07em; }
-    .lead { color: var(--muted); font-size: 20px; line-height: 1.65; max-width: 690px; }
-    .actions { display: flex; flex-wrap: wrap; gap: 14px; margin-top: 32px; }
-    .btn { border: 0; cursor: pointer; padding: 15px 22px; border-radius: 18px; font-weight: 850; font-size: 16px; transition: transform .15s ease, opacity .15s ease, background .15s ease; }
-    .btn:hover { transform: translateY(-1px); }
-    .btn-main { background: linear-gradient(135deg, var(--green), var(--green2)); color: #06110b; box-shadow: 0 16px 46px rgba(98,246,164,.22); }
-    .btn-ghost { background: rgba(255,255,255,.07); border: 1px solid var(--line); color: var(--text); }
-    .stats { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; margin-top: 42px; max-width: 690px; }
-    .stat { background: var(--card2); border: 1px solid var(--line); border-radius: 24px; padding: 18px; }
-    .stat b { display: block; font-size: 28px; letter-spacing: -.04em; }
-    .stat span { color: var(--muted); font-size: 13px; }
-    .swap-card { position: relative; background: linear-gradient(180deg, rgba(255,255,255,.12), rgba(255,255,255,.055)); border: 1px solid var(--line); border-radius: 34px; padding: 24px; box-shadow: 0 30px 90px rgba(0,0,0,.36), 0 0 70px rgba(98,246,164,.16); backdrop-filter: blur(18px); }
-    .swap-top { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
-    .swap-top h2 { margin: 0; font-size: 26px; letter-spacing: -.04em; }
-    .network { color: #bcffe0; font-size: 13px; background: rgba(98,246,164,.12); border: 1px solid rgba(98,246,164,.22); padding: 8px 10px; border-radius: 999px; }
-    label { display: block; color: var(--muted); font-size: 14px; margin-bottom: 8px; }
-    .field, select { width: 100%; border: 1px solid var(--line); background: rgba(0,0,0,.28); color: var(--text); border-radius: 22px; padding: 16px; outline: none; }
-    select { margin-bottom: 16px; }
-    .amount-box { display: flex; align-items: center; border: 1px solid var(--line); background: rgba(0,0,0,.28); border-radius: 24px; overflow: hidden; }
-    .amount-box input { flex: 1; min-width: 0; color: var(--text); background: transparent; border: 0; outline: 0; padding: 18px 16px; font-size: 30px; font-weight: 800; }
-    .token { padding: 0 16px; color: #caffe2; font-weight: 900; }
-    .switch { display: grid; place-items: center; width: 44px; height: 44px; margin: -2px auto 10px; border-radius: 16px; background: rgba(98,246,164,.14); border: 1px solid rgba(98,246,164,.24); color: var(--green); font-size: 22px; }
-    .receive { margin-top: 16px; border-radius: 26px; border: 1px solid rgba(98,246,164,.22); background: rgba(98,246,164,.1); padding: 18px; }
-    .receive small { color: rgba(255,255,255,.62); }
-    .receive strong { display: block; margin-top: 6px; font-size: 34px; letter-spacing: -.04em; }
-    .hint { margin: 12px 0 18px; color: rgba(255,255,255,.52); font-size: 13px; line-height: 1.55; }
-    .warn { margin-top: 14px; color: #ffe1a3; font-size: 13px; line-height: 1.5; }
-    .grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 18px; padding: 18px 0 70px; }
-    .feature { min-height: 190px; background: var(--card2); border: 1px solid var(--line); border-radius: 28px; padding: 24px; }
-    .feature h3 { margin: 12px 0 8px; font-size: 22px; }
-    .feature p { margin: 0; color: var(--muted); line-height: 1.6; }
-    .icon { width: 44px; height: 44px; display: grid; place-items: center; border-radius: 16px; background: rgba(98,246,164,.12); color: var(--green); font-size: 22px; }
-    footer { border-top: 1px solid var(--line); color: rgba(255,255,255,.45); padding: 28px 0 40px; font-size: 13px; }
-    @media (max-width: 920px) {
-      .hero { grid-template-columns: 1fr; padding-top: 26px; }
-      .grid, .stats { grid-template-columns: 1fr; }
-      .nav { display: none; }
-    }
+    :root{--bg:#05070b;--line:rgba(255,255,255,.12);--text:#f6fff9;--muted:rgba(246,255,249,.68);--green:#62f6a4;--green2:#28d985;--cyan:#7dd3fc;--card:rgba(255,255,255,.065)}
+    *{box-sizing:border-box}body{margin:0;min-height:100vh;color:var(--text);font-family:Inter,ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",Arial,sans-serif;background:radial-gradient(circle at 12% 8%,rgba(98,246,164,.24),transparent 28rem),radial-gradient(circle at 86% 18%,rgba(125,211,252,.18),transparent 28rem),linear-gradient(135deg,#05070b,#080d16 55%,#05070b)}
+    .wrap{width:min(1160px,calc(100% - 40px));margin:0 auto}header{padding:28px 0;display:flex;align-items:center;justify-content:space-between;gap:16px}.logo{display:flex;align-items:center;gap:12px;font-weight:900}.logo-mark{width:42px;height:42px;border-radius:16px;background:linear-gradient(135deg,var(--green),var(--cyan));box-shadow:0 0 40px rgba(98,246,164,.28)}.nav{display:flex;gap:14px;color:var(--muted);font-size:14px}.pill{border:1px solid var(--line);background:rgba(255,255,255,.05);padding:10px 14px;border-radius:999px}
+    .hero{display:grid;grid-template-columns:1fr 440px;gap:58px;align-items:center;padding:48px 0 72px}.badge{display:inline-flex;gap:8px;align-items:center;color:#d7ffe9;border:1px solid rgba(98,246,164,.25);background:rgba(98,246,164,.1);padding:10px 14px;border-radius:999px;font-size:14px}.dot{width:8px;height:8px;border-radius:50%;background:var(--green);box-shadow:0 0 18px var(--green)}
+    h1{margin:22px 0 18px;font-size:clamp(46px,7vw,82px);line-height:.96;letter-spacing:-.07em}.lead{color:var(--muted);font-size:20px;line-height:1.65;max-width:690px}.actions{display:flex;flex-wrap:wrap;gap:14px;margin-top:32px}.btn{border:0;cursor:pointer;padding:15px 22px;border-radius:18px;font-weight:850;font-size:16px;transition:.15s}.btn:hover{transform:translateY(-1px)}.btn-main{background:linear-gradient(135deg,var(--green),var(--green2));color:#06110b;box-shadow:0 16px 46px rgba(98,246,164,.22)}.btn-ghost{background:rgba(255,255,255,.07);border:1px solid var(--line);color:var(--text)}.btn:disabled{opacity:.55;cursor:not-allowed;transform:none}
+    .stats{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-top:42px;max-width:690px}.stat{background:rgba(255,255,255,.045);border:1px solid var(--line);border-radius:24px;padding:18px}.stat b{display:block;font-size:28px}.stat span{color:var(--muted);font-size:13px}
+    .swap-card{background:linear-gradient(180deg,rgba(255,255,255,.12),rgba(255,255,255,.055));border:1px solid var(--line);border-radius:34px;padding:24px;box-shadow:0 30px 90px rgba(0,0,0,.36),0 0 70px rgba(98,246,164,.16);backdrop-filter:blur(18px)}.swap-top{display:flex;justify-content:space-between;align-items:center;margin-bottom:20px}.swap-top h2{margin:0;font-size:26px}.network{color:#bcffe0;font-size:13px;background:rgba(98,246,164,.12);border:1px solid rgba(98,246,164,.22);padding:8px 10px;border-radius:999px}label{display:block;color:var(--muted);font-size:14px;margin-bottom:8px}select{width:100%;border:1px solid var(--line);background:rgba(0,0,0,.28);color:var(--text);border-radius:22px;padding:16px;outline:none;margin-bottom:16px}.amount-box{display:flex;align-items:center;border:1px solid var(--line);background:rgba(0,0,0,.28);border-radius:24px;overflow:hidden}.amount-box input{flex:1;min-width:0;color:var(--text);background:transparent;border:0;outline:0;padding:18px 16px;font-size:30px;font-weight:800}.token{padding:0 16px;color:#caffe2;font-weight:900}.switch{display:grid;place-items:center;width:44px;height:44px;margin:-2px auto 10px;border-radius:16px;background:rgba(98,246,164,.14);border:1px solid rgba(98,246,164,.24);color:var(--green);font-size:22px}.receive{margin-top:16px;border-radius:26px;border:1px solid rgba(98,246,164,.22);background:rgba(98,246,164,.1);padding:18px}.receive small{color:rgba(255,255,255,.62)}.receive strong{display:block;margin-top:6px;font-size:34px;letter-spacing:-.04em}.hint{margin:12px 0 18px;color:rgba(255,255,255,.56);font-size:13px;line-height:1.55}.warn{margin-top:14px;color:#ffe1a3;font-size:13px;line-height:1.5}.status{margin-top:12px;padding:12px 14px;border-radius:18px;background:rgba(255,255,255,.055);border:1px solid var(--line);color:var(--muted);font-size:13px;line-height:1.45;word-break:break-word}.ok{color:#baffe0}.bad{color:#ffb1b1}
+    .grid{display:grid;grid-template-columns:repeat(3,1fr);gap:18px;padding:18px 0 70px}.feature{min-height:190px;background:rgba(255,255,255,.045);border:1px solid var(--line);border-radius:28px;padding:24px}.feature h3{margin:12px 0 8px;font-size:22px}.feature p{margin:0;color:var(--muted);line-height:1.6}.icon{width:44px;height:44px;display:grid;place-items:center;border-radius:16px;background:rgba(98,246,164,.12);color:var(--green);font-size:22px}footer{border-top:1px solid var(--line);color:rgba(255,255,255,.45);padding:28px 0 40px;font-size:13px}@media(max-width:920px){.hero{grid-template-columns:1fr;padding-top:26px}.grid,.stats{grid-template-columns:1fr}.nav{display:none}}
   </style>
 </head>
 <body>
   <div class="wrap">
-    <header>
-      <div class="logo"><div class="logo-mark"></div><div>StableSwap</div></div>
-      <nav class="nav">
-        <span class="pill">USDT ↔ USDC</span>
-        <span class="pill">Base network</span>
-        <span class="pill">No custody</span>
-      </nav>
-    </header>
-
+    <header><div class="logo"><div class="logo-mark"></div><div>StableSwap</div></div><nav class="nav"><span class="pill">USDT ↔ USDC</span><span class="pill">Base</span><span class="pill">Ваш кошелек</span></nav></header>
     <main class="hero">
       <section>
         <div class="badge"><span class="dot"></span> Быстрый обмен стейблкоинов</div>
-        <h1>Меняй USDT на USDC без лишних шагов</h1>
-        <p class="lead">Лендинг-сервис для простого non-custodial обмена. Пользователь подключает кошелек, выбирает направление и подтверждает операцию в своем кошельке. Сервис не хранит деньги и seed-фразы.</p>
-        <div class="actions">
-          <button class="btn btn-main" onclick="document.getElementById('swap').scrollIntoView({behavior:'smooth'})">Начать обмен</button>
-          <button class="btn btn-ghost" onclick="alert('На текущем этапе это демо-интерфейс. Реальный swap-провайдер подключается следующим шагом.')">Как работает</button>
-        </div>
-        <div class="stats">
-          <div class="stat"><b>2</b><span>токена на старте</span></div>
-          <div class="stat"><b>Base</b><span>первая сеть</span></div>
-          <div class="stat"><b>0</b><span>хранения средств</span></div>
-        </div>
+        <h1>USDT ↔ USDC за пару кликов</h1>
+        <p class="lead">Подключите кошелек, выберите направление и меняйте стейблкоины в сети Base. Вы контролируете средства, а каждая операция подтверждается только в вашем кошельке.</p>
+        <div class="actions"><button class="btn btn-main" onclick="document.getElementById('swap').scrollIntoView({behavior:'smooth'})">Начать обмен</button><button class="btn btn-ghost" onclick="connectWallet()">Подключить кошелек</button></div>
+        <div class="stats"><div class="stat"><b>Base</b><span>быстрая сеть</span></div><div class="stat"><b>USDT</b><span>отдаете</span></div><div class="stat"><b>USDC</b><span>получаете</span></div></div>
       </section>
-
       <section class="swap-card" id="swap">
-        <div class="swap-top">
-          <div>
-            <h2>Обмен</h2>
-            <div style="color:var(--muted);font-size:14px;margin-top:4px">USDT ↔ USDC</div>
-          </div>
-          <div class="network">Base</div>
-        </div>
-
-        <label for="direction">Направление</label>
-        <select id="direction" onchange="recalc()">
-          <option value="USDT-USDC">USDT → USDC</option>
-          <option value="USDC-USDT">USDC → USDT</option>
-        </select>
-
-        <label>Отдаете</label>
-        <div class="amount-box">
-          <input id="amount" value="100" inputmode="decimal" oninput="recalc()" />
-          <div class="token" id="fromToken">USDT</div>
-        </div>
-
-        <div class="switch">↓</div>
-
-        <div class="receive">
-          <small>Предварительно получите</small>
-          <strong><span id="receive">99.960000</span> <span id="toToken">USDC</span></strong>
-        </div>
-
-        <p class="hint">Сейчас это демо-расчет интерфейса. Следующий этап — подключить реальную котировку и транзакции через 1inch, Li.Fi, Odos или Uniswap.</p>
-        <button class="btn btn-main" style="width:100%" onclick="connectDemo()">Connect wallet</button>
-        <div class="warn">⚠️ Никогда не вводите seed phrase или private key. Настоящий обмен должен подтверждаться только в кошельке.</div>
+        <div class="swap-top"><div><h2>Обмен</h2><div style="color:var(--muted);font-size:14px;margin-top:4px">Быстро, прозрачно, в вашем кошельке</div></div><div class="network" id="networkBadge">Base</div></div>
+        <label for="direction">Направление</label><select id="direction" onchange="recalc()"><option value="USDT-USDC">USDT → USDC</option><option value="USDC-USDT">USDC → USDT</option></select>
+        <label>Отдаете</label><div class="amount-box"><input id="amount" value="100" inputmode="decimal" oninput="recalc()" /><div class="token" id="fromToken">USDT</div></div>
+        <div class="switch">↓</div><div class="receive"><small>Ориентировочно получите</small><strong><span id="receive">99.960000</span> <span id="toToken">USDC</span></strong></div>
+        <p class="hint">Кошелек уже можно подключить. Следующий шаг — реальная котировка и кнопка обмена.</p>
+        <button class="btn btn-main" id="connectBtn" style="width:100%" onclick="connectWallet()">Connect wallet</button>
+        <button class="btn btn-ghost" id="switchBtn" style="width:100%;margin-top:10px;display:none" onclick="switchToBase()">Переключить на Base</button>
+        <div class="status" id="walletStatus">Кошелек не подключен.</div>
+        <div class="warn">⚠️ Никогда не вводите seed phrase или private key. Проверяйте сеть, токены и сумму перед подтверждением.</div>
       </section>
     </main>
-
-    <section class="grid">
-      <div class="feature"><div class="icon">⚡</div><h3>Быстрый сценарий</h3><p>Минимум полей: направление, сумма, кошелек и подтверждение операции.</p></div>
-      <div class="feature"><div class="icon">🔐</div><h3>Без хранения средств</h3><p>Средства остаются у пользователя. Сервис не принимает депозиты на свой адрес.</p></div>
-      <div class="feature"><div class="icon">🧩</div><h3>Готов к развитию</h3><p>После USDT ↔ USDC можно добавить сети, комиссии, историю и другие стейблкоины.</p></div>
-    </section>
-
-    <footer>
-      StableSwap MVP. Demo UI only. Not financial advice. Always verify token addresses and transaction details.
-    </footer>
+    <section class="grid"><div class="feature"><div class="icon">⚡</div><h3>Быстро</h3><p>Простая форма без регистрации и лишних экранов. Выберите сумму и подтвердите действие в кошельке.</p></div><div class="feature"><div class="icon">🔐</div><h3>Безопасно</h3><p>Сервис не просит seed-фразу и не хранит ваши средства. Контроль остается у владельца кошелька.</p></div><div class="feature"><div class="icon">💎</div><h3>Удобно</h3><p>Сфокусировано на самом частом сценарии: быстрый обмен USDT и USDC в одной сети.</p></div></section>
+    <footer>StableSwap — простой интерфейс для обмена стейблкоинов. Всегда проверяйте детали транзакции перед подтверждением.</footer>
   </div>
-
   <script>
-    function recalc() {
-      const direction = document.getElementById('direction').value;
-      const amountInput = document.getElementById('amount');
-      const amount = Number(String(amountInput.value).replace(',', '.'));
-      const from = direction === 'USDT-USDC' ? 'USDT' : 'USDC';
-      const to = direction === 'USDT-USDC' ? 'USDC' : 'USDT';
-      const rate = direction === 'USDT-USDC' ? 0.9996 : 0.9994;
-      document.getElementById('fromToken').textContent = from;
-      document.getElementById('toToken').textContent = to;
-      document.getElementById('receive').textContent = Number.isFinite(amount) && amount > 0 ? (amount * rate).toFixed(6) : '0.000000';
-    }
-    function connectDemo() {
-      alert('Следующий этап: подключить RainbowKit/Wagmi или WalletConnect и реальный swap-провайдер. Сейчас это демо-кнопка.');
-    }
+    const BASE_CHAIN_ID='0x2105';
+    const BASE_PARAMS={chainId:'0x2105',chainName:'Base',nativeCurrency:{name:'Ether',symbol:'ETH',decimals:18},rpcUrls:['https://mainnet.base.org'],blockExplorerUrls:['https://basescan.org']};
+    let account=null;
+    function short(a){return a?`${a.slice(0,6)}...${a.slice(-4)}`:''}
+    function setStatus(text,cls=''){const el=document.getElementById('walletStatus');el.className='status '+cls;el.textContent=text}
+    function recalc(){const d=document.getElementById('direction').value;const amount=Number(String(document.getElementById('amount').value).replace(',','.'));const from=d==='USDT-USDC'?'USDT':'USDC';const to=d==='USDT-USDC'?'USDC':'USDT';const rate=d==='USDT-USDC'?0.9996:0.9994;document.getElementById('fromToken').textContent=from;document.getElementById('toToken').textContent=to;document.getElementById('receive').textContent=Number.isFinite(amount)&&amount>0?(amount*rate).toFixed(6):'0.000000'}
+    async function refreshNetwork(){if(!window.ethereum)return;const chainId=await window.ethereum.request({method:'eth_chainId'});const isBase=chainId===BASE_CHAIN_ID;document.getElementById('networkBadge').textContent=isBase?'Base':'Wrong network';document.getElementById('switchBtn').style.display=isBase?'none':'block';if(account)setStatus(isBase?`Кошелек подключен: ${short(account)} · Base`:`Кошелек подключен: ${short(account)} · переключите сеть на Base`,isBase?'ok':'bad')}
+    async function connectWallet(){try{if(!window.ethereum){setStatus('EVM-кошелек не найден. Установите MetaMask, Rabby или откройте страницу во встроенном браузере кошелька.','bad');return}const accounts=await window.ethereum.request({method:'eth_requestAccounts'});account=accounts[0];document.getElementById('connectBtn').textContent=short(account);await refreshNetwork()}catch(e){setStatus(e&&e.message?e.message:'Подключение отменено.','bad')}}
+    async function switchToBase(){try{await window.ethereum.request({method:'wallet_switchEthereumChain',params:[{chainId:BASE_CHAIN_ID}]});await refreshNetwork()}catch(e){if(e&&e.code===4902){await window.ethereum.request({method:'wallet_addEthereumChain',params:[BASE_PARAMS]});await refreshNetwork()}else setStatus(e&&e.message?e.message:'Не удалось переключить сеть.','bad')}}
+    if(window.ethereum){window.ethereum.on('accountsChanged',(a)=>{account=a&&a[0]?a[0]:null;document.getElementById('connectBtn').textContent=account?short(account):'Connect wallet';setStatus(account?`Кошелек подключен: ${short(account)}`:'Кошелек не подключен.',account?'ok':'');refreshNetwork()});window.ethereum.on('chainChanged',refreshNetwork);}
     recalc();
   </script>
 </body>
